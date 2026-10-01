@@ -1,0 +1,28 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.venv-*/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# Generated trip exports
+/output/
+/TripGenie-*-Travel-Plan.html
+/TripGenie-*-Travel-Plan.pdf
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
