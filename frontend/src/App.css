@@ -1,7 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap");
+
 :root {
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+    "Geist", "Geist Sans", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
   color: #17352a;
   background: #f5f8f6;
@@ -20,18 +22,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background:
-    radial-gradient(
-      circle at 10% 0%,
-      rgba(41, 112, 77, 0.08),
-      transparent 28%
-    ),
-    radial-gradient(
-      circle at 90% 10%,
-      rgba(223, 170, 75, 0.09),
-      transparent 25%
-    ),
-    #f5f8f6;
+  background-color: #f5f8f6;
 }
 
 button,
@@ -55,6 +46,32 @@ button:disabled {
 .app-shell {
   min-height: 100vh;
   color: #17352a;
+  position: relative;
+  isolation: isolate;
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image: var(
+    --backdrop-img,
+    url("./assets/public/TripGenie Backdrop image.png")
+  );
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.app-shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
 }
 
 .topbar {
@@ -133,6 +150,10 @@ button:disabled {
 
 .primary-button:disabled {
   opacity: 0.5;
+}
+
+.rounded-full {
+  border-radius: 9999px !important;
 }
 
 .primary-button.large {
@@ -223,13 +244,15 @@ button:disabled {
 
 .planner-card {
   text-align: left;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid #dce9e2;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(220, 233, 226, 0.85);
   border-radius: 24px;
   padding: 24px;
   box-shadow:
-    0 25px 70px rgba(35, 67, 53, 0.09),
-    0 4px 12px rgba(35, 67, 53, 0.04);
+    0 25px 70px rgba(35, 67, 53, 0.12),
+    0 4px 12px rgba(35, 67, 53, 0.05);
 }
 
 .input-label {
@@ -304,16 +327,23 @@ button:disabled {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 28px;
-  color: #71847b;
+  gap: 14px;
+  color: #234c3a;
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .feature-row div {
   display: flex;
   align-items: center;
   gap: 7px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(220, 233, 226, 0.75);
+  box-shadow: 0 4px 14px rgba(23, 61, 45, 0.06);
 }
 
 .feature-row span {

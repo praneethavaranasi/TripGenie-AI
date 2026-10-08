@@ -1,4 +1,5 @@
-﻿import React, { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
+import backdropImage from "./assets/public/TripGenie Backdrop image.png";
 
 const API_URL = "http://127.0.0.1:8000";
 
@@ -361,9 +362,12 @@ function App() {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TripGenie AI - ${escapeHtml(trip.destination || "Travel Plan")}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f5f8f6; color: #17352a; line-height: 1.6; }
+    body { margin: 0; font-family: "Geist", "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f8f6; color: #17352a; line-height: 1.6; }
     .container { width: min(90%, 950px); margin: 40px auto; }
     .header { padding: 38px; margin-bottom: 20px; border-radius: 22px; background: linear-gradient(135deg, #173d2d, #285740); color: #fff; }
     .brand { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #c6dbcf; }
@@ -471,45 +475,29 @@ function App() {
     setError("");
 
     try {
-      const [
-        { default: jsPDF },
-        { default: notoSansRegular },
-        { default: notoSansBold },
-      ] = await Promise.all([
-        import("jspdf"),
-        import("./assets/fonts/NotoSans-Regular.ttf?inline"),
-        import("./assets/fonts/NotoSans-Bold.ttf?inline"),
-      ]);
+      const { default: jsPDF } = await import("jspdf");
 
-    const pdf = new jsPDF("p", "mm", "a4");
-    const regularFontBase64 = notoSansRegular.slice(
-      notoSansRegular.indexOf(",") + 1
-    );
-    const boldFontBase64 = notoSansBold.slice(notoSansBold.indexOf(",") + 1);
+      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.setFont("helvetica", "normal");
 
-    pdf.addFileToVFS("NotoSans-Regular.ttf", regularFontBase64);
-    pdf.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
-    pdf.addFileToVFS("NotoSans-Bold.ttf", boldFontBase64);
-    pdf.addFont("NotoSans-Bold.ttf", "NotoSans", "bold");
-    pdf.setFont("NotoSans", "normal");
-
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 16;
-    const contentWidth = pageWidth - margin * 2;
-    const breakdown = budget.breakdown || {};
-    const places = Array.isArray(research.recommended_places)
-      ? research.recommended_places
-      : [];
-    const notes = Array.isArray(validation.notes)
-      ? validation.notes
-      : Array.isArray(validation.issues)
-        ? validation.issues
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 16;
+      const contentWidth = pageWidth - margin * 2;
+      const breakdown = budget.breakdown || {};
+      const places = Array.isArray(research.recommended_places)
+        ? research.recommended_places
         : [];
-    let y = 20;
+      const notes = Array.isArray(validation.notes)
+        ? validation.notes
+        : Array.isArray(validation.issues)
+          ? validation.issues
+          : [];
+      let y = 20;
 
-    const clean = (value) => String(value ?? "").trim();
-    const pdfCurrency = (value) => formatCurrency(value);
+      const clean = (value) => String(value ?? "").trim();
+      const pdfCurrency = (value) =>
+        formatCurrency(value).replace(/₹/g, "Rs. ");
     const checkPage = (needed = 15) => {
       if (y + needed > pageHeight - 18) {
         pdf.addPage();
@@ -537,7 +525,7 @@ function App() {
     const addSectionHeading = (text, fontSize = 16) => {
       checkPage(18);
       pdf.setTextColor(23, 61, 45);
-      pdf.setFont("NotoSans", "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(fontSize);
       pdf.text(clean(text), margin, y);
       y += 9;
@@ -546,12 +534,12 @@ function App() {
     pdf.setFillColor(23, 61, 45);
     pdf.rect(0, 0, pageWidth, 48, "F");
     pdf.setTextColor(255, 255, 255);
-    pdf.setFont("NotoSans", "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.setFontSize(11);
     pdf.text("TRIPGENIE AI", margin, 16);
     pdf.setFontSize(25);
     pdf.text(clean(trip.destination || "Travel Plan").slice(0, 42), margin, 30);
-    pdf.setFont("NotoSans", "normal");
+    pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     pdf.text("AI-Powered Personalized Travel Plan", margin, 39);
     y = 62;
@@ -575,11 +563,11 @@ function App() {
       pdf.setFillColor(245, 249, 246);
       pdf.roundedRect(x, boxY, boxWidth, boxHeight, 3, 3, "F");
       pdf.setTextColor(113, 133, 124);
-      pdf.setFont("NotoSans", "normal");
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(8);
       pdf.text(clean(label.toUpperCase()), x + 5, boxY + 7);
       pdf.setTextColor(23, 53, 42);
-      pdf.setFont("NotoSans", "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       pdf.text(clean(value || "Not specified").slice(0, 38), x + 5, boxY + 14);
     });
@@ -587,7 +575,7 @@ function App() {
     y += 2 * (boxHeight + 7) + 8;
     addSectionHeading("Trip Overview");
     pdf.setTextColor(55, 65, 81);
-    pdf.setFont("NotoSans", "normal");
+    pdf.setFont("helvetica", "normal");
     addWrappedText(
       research.destination_overview ||
         "Personalized travel plan generated by TripGenie AI.",
@@ -611,10 +599,10 @@ function App() {
     budgetRows.forEach(([label, value]) => {
       checkPage(9);
       pdf.setTextColor(55, 65, 81);
-      pdf.setFont("NotoSans", "normal");
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10);
       pdf.text(clean(label), margin, y);
-      pdf.setFont("NotoSans", "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.text(pdfCurrency(value), pageWidth - margin, y, { align: "right" });
       pdf.setDrawColor(226, 234, 228);
       pdf.line(margin, y + 2, pageWidth - margin, y + 2);
@@ -625,13 +613,13 @@ function App() {
     addSectionHeading("Recommended Places");
     if (places.length === 0) {
       pdf.setTextColor(75, 85, 99);
-      pdf.setFont("NotoSans", "normal");
+      pdf.setFont("helvetica", "normal");
       addWrappedText("No recommended places were provided.", margin, contentWidth);
     }
     places.forEach((place) => {
       checkPage(14);
       pdf.setTextColor(35, 77, 58);
-      pdf.setFont("NotoSans", "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(10);
       addWrappedText(
         `${place.name || "Recommended place"}${place.category ? ` - ${place.category}` : ""}`,
@@ -641,7 +629,7 @@ function App() {
         5
       );
       pdf.setTextColor(75, 85, 99);
-      pdf.setFont("NotoSans", "normal");
+      pdf.setFont("helvetica", "normal");
       addWrappedText(place.description || "", margin, contentWidth, 9, 4.5);
       y += 3;
     });
@@ -653,12 +641,12 @@ function App() {
       pdf.setFillColor(237, 245, 239);
       pdf.roundedRect(margin, y - 5, contentWidth, 12, 3, 3, "F");
       pdf.setTextColor(53, 112, 82);
-      pdf.setFont("NotoSans", "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(9);
       pdf.text(`DAY ${clean(day.day)}`, margin + 5, y + 3);
       y += 13;
       pdf.setTextColor(23, 53, 42);
-      pdf.setFont("NotoSans", "bold");
+      pdf.setFont("helvetica", "bold");
       addWrappedText(day.title || `Day ${day.day}`, margin, contentWidth, 12, 5.5);
       y += 2;
 
@@ -674,12 +662,12 @@ function App() {
 
         checkPage(11);
         pdf.setTextColor(55, 77, 64);
-        pdf.setFont("NotoSans", "bold");
+        pdf.setFont("helvetica", "bold");
         pdf.setFontSize(10);
         pdf.text(title, margin, y);
         y += 5;
         pdf.setTextColor(75, 85, 99);
-        pdf.setFont("NotoSans", "normal");
+        pdf.setFont("helvetica", "normal");
         items.forEach((item) => {
           addWrappedText(`- ${item}`, margin + 3, contentWidth - 3, 9, 4.5);
           y += 1;
@@ -690,7 +678,7 @@ function App() {
       if (day.estimated_daily_cost !== undefined) {
         checkPage(9);
         pdf.setTextColor(53, 112, 82);
-        pdf.setFont("NotoSans", "bold");
+        pdf.setFont("helvetica", "bold");
         pdf.setFontSize(9);
         pdf.text(
           `Estimated Daily Cost: ${pdfCurrency(day.estimated_daily_cost)}`,
@@ -702,7 +690,7 @@ function App() {
 
       if (day.notes) {
         pdf.setTextColor(100, 116, 139);
-        pdf.setFont("NotoSans", "normal");
+        pdf.setFont("helvetica", "normal");
         addWrappedText(`Notes: ${day.notes}`, margin, contentWidth, 9, 4.5);
         y += 4;
       }
@@ -716,7 +704,7 @@ function App() {
       : [];
     if (importantNotes.length === 0) {
       pdf.setTextColor(75, 85, 99);
-      pdf.setFont("NotoSans", "normal");
+      pdf.setFont("helvetica", "normal");
       addWrappedText("No additional itinerary notes.", margin, contentWidth, 9, 5);
     }
     importantNotes.forEach((note) => {
@@ -727,11 +715,11 @@ function App() {
     y += 4;
     addSectionHeading("Trip Validation");
     pdf.setTextColor(53, 112, 82);
-    pdf.setFont("NotoSans", "bold");
+    pdf.setFont("helvetica", "bold");
     pdf.setFontSize(11);
     addWrappedText(validation.status || "VALID", margin, contentWidth, 11, 5);
     pdf.setTextColor(75, 85, 99);
-    pdf.setFont("NotoSans", "normal");
+    pdf.setFont("helvetica", "normal");
     addWrappedText(
       validation.message || "Trip plan validation completed.",
       margin,
@@ -748,7 +736,7 @@ function App() {
       pdf.setPage(page);
       pdf.setDrawColor(226, 234, 228);
       pdf.line(margin, pageHeight - 12, pageWidth - margin, pageHeight - 12);
-      pdf.setFont("NotoSans", "normal");
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(7);
       pdf.setTextColor(100, 116, 139);
       pdf.text("Generated by TripGenie AI", margin, pageHeight - 7);
@@ -769,7 +757,10 @@ function App() {
   };
 
   return (
-    <div className="app-shell">
+    <div
+      className="app-shell"
+      style={{ "--backdrop-img": `url("${backdropImage}")` }}
+    >
       <header className="topbar">
         <div className="brand">
           <div className="brand-mark">✈</div>
@@ -793,7 +784,7 @@ function App() {
         <main className="hero-section">
           <div className="hero-badge">
             <span className="pulse-dot" />
-            AGENTIC AI TRAVEL PLANNER
+            Agentic AI Travel Planner
           </div>
 
           <h1>
@@ -835,7 +826,7 @@ function App() {
               </button>
 
               <button
-                className="primary-button"
+                className="primary-button rounded-full"
                 onClick={startPlanning}
                 disabled={loading || !request.trim()}
               >
